@@ -12,7 +12,7 @@ final class Pool
 {
     private const CONCURRENCY = 100;
 
-    private const JOB_TIMEOUT = 2.5;
+    private const JOB_TIMEOUT = 3;
 
     private RepositoryInterface $jobRepository;
 
@@ -24,7 +24,7 @@ final class Pool
         $this->logWriter = $logWriter;
     }
 
-    public function run(): void
+    public function run(int $jobsCount): void
     {
         $pool = AsyncPool::create();
         $pool->concurrency(self::CONCURRENCY);
@@ -32,12 +32,12 @@ final class Pool
 
         $this->logWriter->clear();
 
-        $jobs = $this->jobRepository->getJobs();
+        $jobs = $this->jobRepository->getJobs($jobsCount);
         $logWriter = $this->logWriter;
 
         foreach ($jobs as $lead) {
             $pool->add(function() use ($lead) {
-                $timout = random_int(2, 3);
+                $timout = random_int(2, 4);
                 sleep($timout);
 
                 return $lead;
@@ -53,17 +53,5 @@ final class Pool
         }
 
         $pool->wait();
-    }
-
-    private function getLogWriter(): callable
-    {
-        $filePath = realpath(dirname(__FILE__) . '/../../') . '/log/result.log';
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
-
-        return function (string $msg) use ($filePath) {
-            file_put_contents($filePath, $msg . PHP_EOL, FILE_APPEND);
-        };
     }
 }

@@ -30,6 +30,6 @@ class Writer implements WriterInterface
             $status
         );
 
-        file_put_contents($this->filePath, $msg . PHP_EOL, FILE_APPEND);
+        file_put_contents($this->filePath, $msg . PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 }

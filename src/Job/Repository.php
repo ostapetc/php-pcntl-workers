@@ -7,8 +7,6 @@ use LeadGenerator\Lead;
 
 class Repository implements RepositoryInterface
 {
-    private const JOB_COUNT = 10000;
-
     private Generator $leadGenerator;
 
     public function __construct(Generator $leadGenerator)
@@ -16,11 +14,11 @@ class Repository implements RepositoryInterface
         $this->leadGenerator = $leadGenerator;
     }
 
-    public function getJobs(): iterable
+    public function getJobs(int $count): iterable
     {
         $leads = [];
 
-        $this->leadGenerator->generateLeads(self::JOB_COUNT, function (Lead $lead) use (&$leads)  {
+        $this->leadGenerator->generateLeads($count, function (Lead $lead) use (&$leads)  {
             $leads[] = $lead;
         });
 

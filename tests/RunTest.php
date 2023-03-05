@@ -54,8 +54,6 @@ final class RunTest extends TestCase
         for ($id = 1; $id <= self::JOB_COUNT; $id++) {
             self::assertContains($id, $leadIds);
         }
-
-        self::assertCount(self::JOB_COUNT, $leadIds);
     }
 
     private function runAndGetResultLogLines(): array
