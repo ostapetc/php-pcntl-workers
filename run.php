@@ -12,29 +12,50 @@ if (file_exists($filePath)) {
     unlink($filePath);
 }
 
+$logInfo = function (string $msg) use ($filePath) {
+    file_put_contents($filePath, $msg . PHP_EOL, FILE_APPEND);
+};
+
 $pool = Pool::create();
 $pool->concurrency(100);
-$pool->timeout(1);
+
+//Из требований: Если обработка заявок определенной категории невозможна, остальные
+$pool->timeout(2.2);
 
 $startTime = time();
 
-for($i = 1; $i <= 10000; $i++) {
-    echo "Add job {$i}\n";
+$generator = new \LeadGenerator\Generator();
 
-    $job = $pool->add(function() use ($i, $filePath) {
-        $content = md5(random_bytes(2048));
-        $result = "job_{$i} {$content}";
+$generator->generateLeads(100, function (\LeadGenerator\Lead $lead) use ($pool, $logInfo)  {
+    $pool->add(function() use ($lead, $logInfo) {
+        $timout = random_int(2, 3);
+        sleep($timout);
 
-        sleep(2);
-        file_put_contents($filePath, $result . PHP_EOL, FILE_APPEND);
+        return $lead;
+    })->then(function (\LeadGenerator\Lead $lead) use ($logInfo) {
+        $msg = sprintf(
+            "%s | %s | %s | %s",
+            $lead->id,
+            $lead->categoryName,
+            date('Y-m-d H:i:s'),
+            'success'
+        );
 
-        return $result;
-    })->then(function ($result) {
-        echo "Job result: {$result}" . PHP_EOL;
-    })->timeout(function () {
-                
+        $logInfo($msg);
+    })->timeout(function () use ($lead, $logInfo) {
+        $msg = sprintf(
+            "%s | %s | %s | %s",
+            $lead->id,
+            $lead->categoryName,
+            date('Y-m-d H:i:s'),
+            'timeout error'
+        );
+
+        $logInfo($msg);
     });
-}
+
+    printf("Added job %s | %s | %s\n", $lead->id, $lead->categoryName, date('Y-m-d H:i:s'));
+});
 
 $pool->wait();
 
