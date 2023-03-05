@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 final class RunTest extends TestCase
 {
-    private const JOB_COUNT = 100;
+    private const JOB_COUNT = 10000;
 
     private const LEAD_CATEGORIES = [
         'Buy auto',
@@ -24,7 +24,15 @@ final class RunTest extends TestCase
 
     public function testRun(): void
     {
+        $startTime = time();
+
         $lines = $this->runAndGetResultLogLines();
+
+        $tookTime = time() - $startTime;
+
+        //took less than 10 minutes
+        self::assertLessThan(60 * 10, $tookTime);
+
         $leadIds = [];
 
         foreach ($lines as $line) {

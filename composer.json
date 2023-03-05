@@ -4,7 +4,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "Os\\PhpPcntlWorkers\\": "src/"
+            "App\\": "src/"
         }
     },
     "authors": [

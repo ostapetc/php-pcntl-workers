@@ -2,83 +2,16 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-//https://github.com/vladimir163/lead-generator
-//https://docs.google.com/document/d/12ia3kVyMn0WAaPzXOdRNbqKKE6YTx1MYwuELch7AaVw/edit#
+use App\Job\Repository;
+use App\Worker\Pool;
+use LeadGenerator\Generator;
+use App\Log\Writer as LogWriter;
 
-use Spatie\Async\Pool;
+$jobRepository = new Repository(new Generator());
+$logWriter = new LogWriter();
 
-$filePath = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'log/result.log';
-if (file_exists($filePath)) {
-    unlink($filePath);
-}
+$workerPool = new Pool($jobRepository, $logWriter);
+$workerPool->run();
 
-$logInfo = function (string $msg) use ($filePath) {
-    file_put_contents($filePath, $msg . PHP_EOL, FILE_APPEND);
-};
-
-$pool = Pool::create();
-$pool->concurrency(100);
-
-//Из требований: Если обработка заявок определенной категории невозможна, остальные
-$pool->timeout(2.5);
-
-$startTime = time();
-
-
-$leads = [];
-
-$generator = new \LeadGenerator\Generator();
-$generator->generateLeads(100, function (\LeadGenerator\Lead $lead) use (&$leads)  {
-    $leads[] = $lead;
-});
-
-foreach ($leads as $lead) {
-    $pool->add(function() use ($lead, $logInfo) {
-        $timout = random_int(2, 3);
-        sleep($timout);
-
-        return $lead;
-    })->then(function (\LeadGenerator\Lead $lead) use ($logInfo) {
-        $msg = sprintf(
-            "%s | %s | %s | %s",
-            $lead->id,
-            $lead->categoryName,
-            date('Y-m-d H:i:s'),
-            'success'
-        );
-
-        $logInfo($msg);
-    })->timeout(function () use ($lead, $logInfo) {
-        $msg = sprintf(
-            "%s | %s | %s | %s",
-            $lead->id,
-            $lead->categoryName,
-            date('Y-m-d H:i:s'),
-            'timeout error'
-        );
-
-        $logInfo($msg);
-    })->catch(function (Exception $exception) use ($lead, $logInfo) {
-        $msg = sprintf(
-            "%s | %s | %s | %s",
-            $lead->id,
-            $lead->categoryName,
-            date('Y-m-d H:i:s'),
-            'exception error: ' . get_class($exception) . ' ' . $exception->getMessage()
-        );
-
-        $logInfo($msg);
-    });
-
-    printf("Added job %s | %s | %s\n", $lead->id, $lead->categoryName, date('Y-m-d H:i:s'));
-}
-
-$pool->wait();
-
-$tookTime = time() - $startTime;
-
-echo "Start time " . date("Y-m-d H:i:s", $startTime) . "\n";
-echo "Now " . date("Y-m-d H:i:s") . "\n";
-echo "Took time {$tookTime} sec.\n";
-
+echo "All jobs are processed.\n";
 

@@ -22,10 +22,6 @@ class ComposerStaticInitc71ca636c7bdb2a77f1f0662cb64380c
         array (
             'PhpParser\\' => 10,
         ),
-        'O' => 
-        array (
-            'Os\\PhpPcntlWorkers\\' => 19,
-        ),
         'L' => 
         array (
             'LeadGenerator\\' => 14,
@@ -34,6 +30,10 @@ class ComposerStaticInitc71ca636c7bdb2a77f1f0662cb64380c
         'D' => 
         array (
             'DeepCopy\\' => 9,
+        ),
+        'A' => 
+        array (
+            'App\\' => 4,
         ),
     );
 
@@ -50,10 +50,6 @@ class ComposerStaticInitc71ca636c7bdb2a77f1f0662cb64380c
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
-        'Os\\PhpPcntlWorkers\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/src',
-        ),
         'LeadGenerator\\' => 
         array (
             0 => __DIR__ . '/..' . '/vladimir163/lead-generator/src',
@@ -65,6 +61,10 @@ class ComposerStaticInitc71ca636c7bdb2a77f1f0662cb64380c
         'DeepCopy\\' => 
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
+        ),
+        'App\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
         ),
     );
 
