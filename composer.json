@@ -16,5 +16,8 @@
     "require": {
         "vladimir163/lead-generator": "dev-master",
         "spatie/async": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10"
     }
 }

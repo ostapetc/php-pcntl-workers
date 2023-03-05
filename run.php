@@ -20,13 +20,19 @@ $pool = Pool::create();
 $pool->concurrency(100);
 
 //Из требований: Если обработка заявок определенной категории невозможна, остальные
-$pool->timeout(2.2);
+$pool->timeout(2.5);
 
 $startTime = time();
 
-$generator = new \LeadGenerator\Generator();
 
-$generator->generateLeads(100, function (\LeadGenerator\Lead $lead) use ($pool, $logInfo)  {
+$leads = [];
+
+$generator = new \LeadGenerator\Generator();
+$generator->generateLeads(100, function (\LeadGenerator\Lead $lead) use (&$leads)  {
+    $leads[] = $lead;
+});
+
+foreach ($leads as $lead) {
     $pool->add(function() use ($lead, $logInfo) {
         $timout = random_int(2, 3);
         sleep($timout);
@@ -52,10 +58,20 @@ $generator->generateLeads(100, function (\LeadGenerator\Lead $lead) use ($pool, 
         );
 
         $logInfo($msg);
+    })->catch(function (Exception $exception) use ($lead, $logInfo) {
+        $msg = sprintf(
+            "%s | %s | %s | %s",
+            $lead->id,
+            $lead->categoryName,
+            date('Y-m-d H:i:s'),
+            'exception error: ' . get_class($exception) . ' ' . $exception->getMessage()
+        );
+
+        $logInfo($msg);
     });
 
     printf("Added job %s | %s | %s\n", $lead->id, $lead->categoryName, date('Y-m-d H:i:s'));
-});
+}
 
 $pool->wait();
 
