@@ -1,0 +1,10 @@
+version: '2.3'
+
+services:
+    worker:
+        build: docker/php
+        volumes:
+            - "./:/home/project/app"
+            - "./docker/php/conf/supervisord.conf:/etc/supervisor/supervisord.conf"
+            - "./docker/php/conf/supervisord-programs.conf:/etc/supervisor/conf.d/workers.conf"
+        command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]

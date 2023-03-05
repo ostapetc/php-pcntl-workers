@@ -1,0 +1,20 @@
+{
+    "name": "os/php-pcntl-workers",
+    "type": "project",
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Os\\PhpPcntlWorkers\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "os",
+            "email": "artemostapetc@gmail.com"
+        }
+    ],
+    "require": {
+        "vladimir163/lead-generator": "dev-master",
+        "spatie/async": "dev-master"
+    }
+}
